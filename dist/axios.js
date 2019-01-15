@@ -1,4 +1,3 @@
-/* axios v0.19.0-beta.1 | (c) 2018 by Matt Zabriskie */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -647,6 +646,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  if (serializedParams) {
+	    var hashmarkIndex = url.indexOf('#');
+	    if (hashmarkIndex !== -1) {
+	      url = url.slice(0, hashmarkIndex);
+	    }
+	
 	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
 	  }
 	
@@ -994,10 +998,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
 	    }
 	
-	    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+	    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), !config.sync);
 	
-	    // Set the request timeout in MS
-	    request.timeout = config.timeout;
+	    if (!config.sync) {
+	      // Set the request timeout in MS
+	      request.timeout = config.timeout;
+	    }
 	
 	    // Listen for ready state
 	    request.onreadystatechange = function handleLoad() {
@@ -1219,8 +1225,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (code) {
 	    error.code = code;
 	  }
+	
 	  error.request = request;
 	  error.response = response;
+	  error.isAxiosError = true;
+	
 	  error.toJSON = function() {
 	    return {
 	      // Standard
@@ -1515,11 +1524,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 	
 	  utils.forEach([
-	    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
-	    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
-	    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
-	    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
-	    'socketPath'
+	    'baseURL',
+	    'transformRequest',
+	    'transformResponse',
+	    'paramsSerializer',
+	    'timeout',
+	    'withCredentials',
+	    'adapter',
+	    'responseType',
+	    'xsrfCookieName',
+	    'xsrfHeaderName',
+	    'onUploadProgress',
+	    'onDownloadProgress',
+	    'maxContentLength',
+	    'validateStatus',
+	    'maxRedirects',
+	    'httpAgent',
+	    'httpsAgent',
+	    'cancelToken',
+	    'socketPath',
+	    'sync'
 	  ], function defaultToConfig2(prop) {
 	    if (typeof config2[prop] !== 'undefined') {
 	      config[prop] = config2[prop];
